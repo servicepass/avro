@@ -7,4 +7,5 @@ mvn \
 	-DskipTests=true \
 	-Drat.skip=true \
 	-Dcheckstyle.skip \
+  source:jar \
   install
