@@ -11,3 +11,7 @@ Learn more about Avro, please visit our website at:
 To contribute to Avro, please read:
 
   https://cwiki.apache.org/confluence/display/AVRO/How+To+Contribute
+
+## Why this fork
+
+This fork addresses issue [Apache Avro/AVRO-2723](https://issues.apache.org/jira/browse/AVRO-2723?page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&focusedCommentId=17031652#)
