@@ -17,14 +17,6 @@
  */
 package org.apache.avro.generic;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Collection;
-
 import org.apache.avro.AvroRuntimeException;
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.Conversion;
@@ -35,7 +27,17 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 
-/** {@link DatumWriter} for generic Java objects. */
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * {@link DatumWriter} for generic Java objects.
+ */
 public class GenericDatumWriter<D> implements DatumWriter<D> {
   private final GenericData data;
   private Schema root;
@@ -58,7 +60,9 @@ public class GenericDatumWriter<D> implements DatumWriter<D> {
     setSchema(root);
   }
 
-  /** Return the {@link GenericData} implementation. */
+  /**
+   * Return the {@link GenericData} implementation.
+   */
   public GenericData getData() {
     return data;
   }
@@ -72,7 +76,9 @@ public class GenericDatumWriter<D> implements DatumWriter<D> {
     write(root, datum, out);
   }
 
-  /** Called to write data. */
+  /**
+   * Called to write data.
+   */
   protected void write(Schema schema, Object datum, Encoder out) throws IOException {
     LogicalType logicalType = schema.getLogicalType();
     if (datum != null && logicalType != null) {
@@ -86,7 +92,7 @@ public class GenericDatumWriter<D> implements DatumWriter<D> {
   /**
    * Convert a high level representation of a logical type (such as a BigDecimal)
    * to the its underlying representation object (such as a ByteBuffer).
-   * 
+   *
    * @throws IllegalArgumentException if a null schema or logicalType is passed in
    *                                  while datum and conversion are not null.
    *                                  Please be noticed that the exception type
@@ -122,7 +128,9 @@ public class GenericDatumWriter<D> implements DatumWriter<D> {
     }
   }
 
-  /** Called to write data. */
+  /**
+   * Called to write data.
+   */
   protected void writeWithoutConversion(Schema schema, Object datum, Encoder out) throws IOException {
     try {
       switch (schema.getType()) {
@@ -178,7 +186,9 @@ public class GenericDatumWriter<D> implements DatumWriter<D> {
     }
   }
 
-  /** Helper method for adding a message to an NPE. */
+  /**
+   * Helper method for adding a message to an NPE.
+   */
   protected NullPointerException npe(NullPointerException e, String s) {
     NullPointerException result = new NullPointerException(e.getMessage() + s);
     result.initCause(e.getCause() == null ? e : e.getCause());
@@ -202,6 +212,9 @@ public class GenericDatumWriter<D> implements DatumWriter<D> {
    */
   protected void writeField(Object datum, Field f, Encoder out, Object state) throws IOException {
     Object value = data.getField(datum, f.name(), f.pos(), state);
+    if (value == null && f.hasDefaultValue()) {
+      value = f.defaultVal();
+    }
     try {
       write(f.schema(), value, out);
     } catch (NullPointerException e) {
@@ -243,7 +256,7 @@ public class GenericDatumWriter<D> implements DatumWriter<D> {
 
   /**
    * Called to find the index for a datum within a union. By default calls
-   * {@link GenericData#resolveUnion(Schema,Object)}.
+   * {@link GenericData#resolveUnion(Schema, Object)}.
    */
   protected int resolveUnion(Schema union, Object datum) {
     return data.resolveUnion(union, datum);
