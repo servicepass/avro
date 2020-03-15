@@ -17,6 +17,14 @@
  */
 package org.apache.avro.util.internal;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.TokenBuffer;
+import org.apache.avro.AvroRuntimeException;
+import org.apache.avro.JsonProperties;
+import org.apache.avro.Schema;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -25,14 +33,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.avro.AvroRuntimeException;
-import org.apache.avro.JsonProperties;
-import org.apache.avro.Schema;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.TokenBuffer;
 
 public class JacksonUtils {
 
@@ -84,8 +84,13 @@ public class JacksonUtils {
     } else if (datum instanceof Boolean) { // boolean
       generator.writeBoolean((Boolean) datum);
     } else {
-      throw new AvroRuntimeException("Unknown datum class: " + datum.getClass());
+      toJson(objectToMap(datum), generator);
+      // throw new AvroRuntimeException("Unknown datum class: " + datum.getClass());
     }
+  }
+
+  protected static Map objectToMap(Object datum) {
+    return new ObjectMapper().convertValue(datum, Map.class);
   }
 
   public static Object toObject(JsonNode jsonNode) {
